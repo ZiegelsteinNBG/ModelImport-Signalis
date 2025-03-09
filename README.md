@@ -27,4 +27,11 @@ Open Unity Hub and create a new 3D Core project. (Projects > New Project > Core 
 
 ### 3. Import the AssetBundle Scripts
 Import the script into Unity by placing it inside your Assets/Scripts/ folder. (Create the Scripts folder)
+Drag the scripts into the Scripts folder.
 
+### 4. Import the AssetBundleExample Model
+Download the AssetBundleExample and go to Assets > Load AssetBundle in Unity. Select the example AssetBundle file.
+If everything is set up correctly, the example model should appear in the scene.
+<p align="center">
+  <img align="center" src="img/ScriptAndImport.png">
+</p>
