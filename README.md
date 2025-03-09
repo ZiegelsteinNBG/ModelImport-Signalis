@@ -14,7 +14,7 @@ Please do me a favor and title your mod with the prefix "MI-" so it's visible th
 - [Required Version of Unity 2020.3.36](https://unity.com/releases/editor/whats-new/2020.3.36#release-notes)
 - [AssetBundleBuilder Script](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/tree/main/AssetBundle%20Scripts)
 - Import the [AssetBundleExample](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/tree/main/AssetBundleExample) into your Unity project via the [AssetBundleLoader](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/tree/main/AssetBundle%20Scripts) script to understand the correct structure and setup.
-- Your AssetBundle must contain both your model and the metarig. The metarig should be named exactly as in the [example AssetBundle](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/tree/main/AssetBundleExample) and must have the same bone count to ensure compatibility.
+- Your AssetBundle must contain both your model and the metarig. The metarig should be named exactly as in the [example AssetBundle](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/tree/main/AssetBundleExample) and must have the same bone names to ensure compatibility.
   
 ### 1. Download and Install Unity Hub & Unity
 Download and install [Unity Hub](https://docs.unity3d.com/hub/manual/InstallHub.html)
