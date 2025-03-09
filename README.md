@@ -13,6 +13,9 @@ This mod operates based on demand, so I list the following possibilities where I
 - Enemy models
 - etc.
 
+## Mod requirement
+Unlike older mods, this mod is updated to work with MelonLoader 0.7.0.
+
 # Model export guide
 Please read this guide carefully. If you have any difficulties understanding specific steps, have suggestions for improvement, need any help or found some errors, feel free to post an issue on GitHub or contact me on Discord (user: ziegelstein).
 
