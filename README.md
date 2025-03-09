@@ -4,7 +4,7 @@ Everything is currently WIP: scripts, mod, guide...
 This mod allows importing custom models into Signalis by loading AssetBundles.
 
 ## Model export guide
-
+Please read this guide carefully. If you have any difficulties understanding specific steps or have suggestions for improvement, feel free to post an issue on GitHub or contact me on Discord (user: ziegelstein).
 
 ### Requirements:
 - [Unity Hub](https://docs.unity3d.com/hub/manual/InstallHub.html)
