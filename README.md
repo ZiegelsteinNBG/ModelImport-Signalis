@@ -7,6 +7,7 @@ This mod allows importing custom models into Signalis by loading AssetBundles.
 Please read this guide carefully. If you have any difficulties understanding specific steps, have suggestions for improvement or need any help, feel free to post an issue on GitHub or contact me on Discord (user: ziegelstein).
 
 This guide provides information on the requirements your model must meet and how to export it from Unity as an AssetBundle. However, the process of importing your model from Blender and rigging it in the Unity Editor is up to you.
+Please do me a favor and title your mod with the prefix "MI-" so it's visible that it's a customization mod (this will help make it clear to possible future mods ;)) when you publish it on NexusMods.
 
 #### Requirements:
 - [Unity Hub](https://docs.unity3d.com/hub/manual/InstallHub.html)
