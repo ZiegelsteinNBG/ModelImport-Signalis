@@ -20,7 +20,7 @@ Download and install [Unity Hub](https://docs.unity3d.com/hub/manual/InstallHub.
 Ensure you have the correct [Unity Version 2020.3.36](https://unity.com/releases/editor/whats-new/2020.3.36#release-notes) installed. 
 
 ### 2. Create a New Unity Project
-Open Unity Hub and create a new 3D Core project. (Projects > New Project > Core > Universal 3D, make here sure to chose the correct Unity Editor 2020.3.36)
+Open Unity Hub and create a new 3D Core project. (Projects > New Project > Core > 3D(Built-In Render Pipeline), make here sure to chose the correct Unity Editor 2020.3.36)
 
 ### 3. Import the AssetBundle Scripts
 Import the script into Unity by placing it inside your Assets/Scripts/ folder. (Create the Scripts folder)
