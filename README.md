@@ -74,6 +74,6 @@ In the current version of the mod, you must name it model. In the future, you wi
 To build the AssetBundles, go to Assets > Build AssetBundles. Ignore the AssetBundle named after your directory—this is Unity's internal process.
 
 ### 7. Testing the AssetBundle
-You can test it by creating a new Unity project and importing the AssetBundle with a script.
+You can test it by creating a new Unity project and importing the AssetBundle with the script.
 
 Alternatively, and more importantly, you can test it by placing the AssetBundle in the ModelImporter_data folder and testing the mod.
