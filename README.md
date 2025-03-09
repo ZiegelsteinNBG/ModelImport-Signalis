@@ -16,7 +16,7 @@ This mod operates based on demand, so I list the following possibilities where I
 ## Mod requirement
 Unlike older mods, this mod is updated to work with MelonLoader 0.7.0.
 
-# Model export guide
+# Model export guide as Unity AssetBundle
 Please read this guide carefully. If you have any difficulties understanding specific steps, have suggestions for improvement, need any help or found some errors, feel free to post an issue on GitHub or contact me on Discord (user: ziegelstein).
 
 This guide provides information on the requirements your model must meet and how to export it from Unity as an AssetBundle. However, the process of importing your model from Blender and rigging it in the Unity Editor is up to you.
