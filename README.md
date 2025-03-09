@@ -1,4 +1,5 @@
-# ModelImport-Signalis
+# ModelImport-Signalis[WIP]
+Everything is currently WIP: scripts, mod, guide...
 This mod allows importing custom models into Signalis by loading AssetBundles.
 
 ## Model export guide
