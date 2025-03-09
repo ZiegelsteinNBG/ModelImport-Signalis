@@ -7,13 +7,22 @@ public class AssetBundleLoader : EditorWindow
     [MenuItem("Assets/Load AssetBundle")]
     static void LoadAssetBundle()
     {
-        string path = "C:\\Users\\..."; //Please insert here your AssetBundle file Path
+        // Open file explorer to select an AssetBundle file
+        string path = EditorUtility.OpenFilePanel("Select AssetBundle", "", ""); // Filters for any file type
+
+        if (string.IsNullOrEmpty(path)) // Check if user canceled the selection
+        {
+            Debug.LogWarning("No file selected.");
+            return;
+        }
+
         if (!File.Exists(path))
         {
             Debug.LogError("AssetBundle not found!");
             return;
         }
 
+        // Load the AssetBundle
         AssetBundle bundle = AssetBundle.LoadFromFile(path);
         if (bundle == null)
         {
@@ -21,6 +30,7 @@ public class AssetBundleLoader : EditorWindow
             return;
         }
 
+        // Load all assets from the bundle
         string[] assetNames = bundle.GetAllAssetNames();
         foreach (string assetName in assetNames)
         {
@@ -32,5 +42,8 @@ public class AssetBundleLoader : EditorWindow
                 Debug.Log($"Loaded: {obj.name}");
             }
         }
+
+        // Unload bundle after use (optional)
+        bundle.Unload(false);
     }
 }
