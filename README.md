@@ -24,6 +24,7 @@ Open Unity Hub and create a new 3D Core project. (Projects > New Project > Core 
 <p align="center">
   <img align="center" src="img/CreateProject.png">
 </p>
+
 ### 3. Import the AssetBundle Scripts
 Import the script into Unity by placing it inside your Assets/Scripts/ folder. (Create the Scripts folder)
 
