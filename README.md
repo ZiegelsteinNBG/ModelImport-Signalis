@@ -34,7 +34,7 @@ Version 0.1.0-alpha is the first working release. Future versions may change req
 Inside the Mods folder, you will find a ModelImporter_data folder.
 Place your AssetBundle files inside this folder to use them with the mod.
 
-[Download v0.1.0-alpha]([https://github.com/YOUR_USERNAME/YOUR_REPOSITORY/releases/tag/v1.0.0](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/releases/tag/v0.1.0-alpha))
+[Download v0.1.0-alpha](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/releases/tag/v0.1.0-alpha)
 
 # Model export guide as Unity AssetBundle
 Please read this guide carefully. If you have any difficulties understanding specific steps, have suggestions for improvement, need any help or found some errors, feel free to post an issue on GitHub or contact me on Discord (user: ziegelstein).
