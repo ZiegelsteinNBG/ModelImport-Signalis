@@ -35,7 +35,7 @@ Place your AssetBundle files inside this folder to use them with the mod.
 
 [Download v0.1.0-alpha](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/releases/tag/v0.1.0-alpha)
 
-# Model export guide as Unity AssetBundle
+## Model export guide as Unity AssetBundle
 Please read this guide carefully. If you have any difficulties understanding specific steps, have suggestions for improvement, need any help or found some errors, feel free to post an issue on GitHub or contact me on Discord (user: ziegelstein).
 
 This guide provides information on the requirements your model must meet and how to export it from Unity as an AssetBundle. However, the process of importing your model from Blender and rigging it in the Unity Editor is up to you.
