@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using MelonLoader;
 using Model_Importer;
 
-[assembly: MelonInfo(typeof(ModelImporter), "ModelImporter", "1.0.0", "Ziegelstein")]
+[assembly: MelonInfo(typeof(ModelImporter), "ModelImporter", "0.1.0", "Ziegelstein")]
 [assembly: MelonGame("", "")]
 
 // General Information about an assembly is controlled through the following

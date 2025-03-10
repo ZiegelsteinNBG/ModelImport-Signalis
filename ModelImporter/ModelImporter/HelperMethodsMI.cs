@@ -224,20 +224,23 @@ namespace Model_Importer
             }
         }
 
-        public static SkinnedMeshRenderer insertAlternative(GameObject model_or, String model_s, String name, String body, String normal, Dictionary<String, int> dict)
+        public static SkinnedMeshRenderer insertAlternative(GameObject model_or, String name, String body, String normal, Dictionary<String, int> dict)
         {
-            model_or.SetActive(true);
-            GameObject model = copyObjectDDOL(model_s, model_s, false);
-            model_or.SetActive(false);
-            setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default", model);
-
-            GameObject root = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{model_s}/{normal}/Root/");
+ 
+            setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default", model_or);
+            MelonLogger.Msg($"Set Parent for Model: {model_or.name}");
+            GameObject root = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{model_or.name}/{normal}/Root/");
+            if(root == null)
+            {
+                MelonLogger.Error($"Root not found for {model_or.name}");
+                return null;
+            }
             root.name = $"Root_{name}";
             setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/", root);
             root.transform.localPosition = Vector3.zero;
             root.transform.localRotation = new Quaternion(0, 0, 0.7071f, 0.7071f);
 
-            SkinnedMeshRenderer skin = model.transform.Find(body).GetComponent<SkinnedMeshRenderer>();
+            SkinnedMeshRenderer skin = model_or.transform.Find(body).GetComponent<SkinnedMeshRenderer>();
             skin.bones[dict["hips"]].localPosition = Vector3.zero;
 
             copyComponent(skin.bones[dict["hand_R"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/", "WeaponMount", true);
