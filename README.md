@@ -13,8 +13,28 @@ This mod operates based on demand, so I list the following possibilities where I
 - Enemy models
 - etc.
 
-## Mod requirement
-Unlike older mods, this mod is updated to work with MelonLoader 0.7.0.
+[Planned] v0.2.0: Height offset
+
+## Mod requirement/ installment
+This mod allows importing custom models into Signalis by loading AssetBundles.
+Version 0.1.0-alpha is the first working release. Future versions may change requirements and introduce new features.
+
+**Requirement:**
+[**Melonloader v0.7.0**](https://melonwiki.xyz/#/README?id=automated-installation)
+
+**Where to put the file?**
+
+- Open Steam 
+- Right click Signalis
+- Manage>Browse local Files
+- After installing MelonLoader, place the contents of the zipped mod folder into the Signalis Mod folder.
+
+**Placing AssetBundle Model:**
+
+Inside the Mods folder, you will find a ModelImporter_data folder.
+Place your AssetBundle files inside this folder to use them with the mod.
+
+[Download v0.1.0-alpha]([https://github.com/YOUR_USERNAME/YOUR_REPOSITORY/releases/tag/v1.0.0](https://github.com/ZiegelsteinNBG/ModelImport-Signalis/releases/tag/v0.1.0-alpha))
 
 # Model export guide as Unity AssetBundle
 Please read this guide carefully. If you have any difficulties understanding specific steps, have suggestions for improvement, need any help or found some errors, feel free to post an issue on GitHub or contact me on Discord (user: ziegelstein).
