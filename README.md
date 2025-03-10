@@ -13,7 +13,7 @@ This mod operates based on demand, so I list the following possibilities where I
 - Enemy models
 - etc.
 
-[Planned] v0.2.0: Height offset
+[Planned] v0.2.0-alpha: Height offset
 
 ## Mod requirement/ installment
 This mod allows importing custom models into Signalis by loading AssetBundles.
