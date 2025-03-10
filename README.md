@@ -16,7 +16,6 @@ This mod operates based on demand, so I list the following possibilities where I
 [Planned] v0.2.0-alpha: Height offset
 
 ## Mod requirement/ installment
-This mod allows importing custom models into Signalis by loading AssetBundles.
 Version 0.1.0-alpha is the first working release. Future versions may change requirements and introduce new features.
 
 **Requirement:**
