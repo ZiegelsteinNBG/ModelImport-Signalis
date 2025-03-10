@@ -1,0 +1,76 @@
+# Visual Studio & VS Code specific files
+.vscode/
+.vs/
+*.code-workspace
+
+# Build and binaries
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.ilk
+*.ilk
+*.lib
+*.ncb
+*.sdf
+*.opensdf
+*.tlog
+*.VC.db
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.sln.docstates
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# Logs, database, and temp files
+*.log
+*.sqlite
+*.db
+*.mdf
+*.ldf
+*.ndf
+*.tmp
+*.bak
+
+# IDE Settings
+*.sln.ide
+*.csproj.user
+*.csproj.vspscc
+
+# Rider & JetBrains
+.idea/
+*.sln.iml
+*.dotCover
+ReSharperSettings.xml
+
+# Unity (if applicable)
+Library/
+Temp/
+Logs/
+obj/
+ProjectSettings/
+MemoryCaptures/
+
+# Secrets and environment variables
+secrets.json
+.env
+appsettings.Development.json
+appsettings.Local.json
+
+# Node.js dependencies (if using JavaScript/TypeScript)
+node_modules/
+npm-debug.log
+yarn.lock
+
+# Docker
+docker-compose.override.yml
