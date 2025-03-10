@@ -77,3 +77,7 @@ To build the AssetBundles, go to Assets > Build AssetBundles. Ignore the AssetBu
 You can test it by creating a new Unity project and importing the AssetBundle with the script.
 
 Alternatively, and more importantly, you can test it by placing the AssetBundle in the ModelImporter_data folder and testing the mod.
+
+<p align="center">
+  <img align="center" src="img/MISuccess.png">
+</p>
