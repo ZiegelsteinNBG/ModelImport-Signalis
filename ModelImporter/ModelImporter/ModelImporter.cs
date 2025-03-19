@@ -9,9 +9,6 @@ using Il2CppSystem.IO;
 using UnityEngine.SceneManagement;
 using Il2Cpp;
 using Il2CppSystem;
-using UnityEngine.UI;
-using static Il2CppUTJ.FrameCapturer.DataPath;
-using static Model_Importer.ModelImporter;
 using System.Xml.Serialization;
 
 
@@ -19,31 +16,37 @@ namespace Model_Importer
 {
     public class ModelImporter: MelonMod
     {
+
         private string dataPath;
         string currentDirectory;
         List<string> assetBundlePaths;
         Il2CppAssetBundle ab;
         static SkinnedMeshRenderer body_skin;
         GameObject player;
+
         
         Dictionary<string, int> boneDict;
         
 
+
         public override void OnUpdate()
         {
-            if(player == null && GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default") != null)
+            if (player == null && GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default") != null)
             {
                 LoadModel();
             }
             if (body_skin != null && GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default") != null)
             {
-                updatePose();
+
+                if(player != null)updatePose();
             }
         }
 
+
         private void LoadModel()
         {
-            currentDirectory = System.Environment.CurrentDirectory;
+            if(ab != null) ab.Unload(true);
+            currentDirectory = Directory.GetCurrentDirectory();
             dataPath = Path.Combine(currentDirectory, "Mods", "ModelImporter_Data");
             MelonLogger.Msg($"Data Path: {dataPath} {Directory.Exists(dataPath)}");
 
@@ -76,19 +79,20 @@ namespace Model_Importer
                     }
                     string[] assetNames = ab.AllAssetNames();
                     string objectName =Path.GetFileNameWithoutExtension(assetNames[0]);
-
+                    MelonLogger.Msg($"Found model: {objectName}");
                     player = GameObject.Instantiate(ab.LoadAsset<GameObject>(objectName).TryCast<GameObject>());// TODO
                     if (player == null)
                     {
                         MelonLogger.Error($"Failed to load asset 'Model' from AssetBundle: {file}");
                         continue;
                     }
+                    
                     foreach (Il2CppSystem.Object child in player.transform)
                     {
                         MelonLogger.Msg($"Child: {child.TryCast<Transform>().name}");
                     }
                     player.name = "Model";
-                    ab.Unload(false);
+                    
                     break;
                 }
             }
@@ -100,6 +104,7 @@ namespace Model_Importer
                 body_skin = player.transform.Find("Body").GetComponent<SkinnedMeshRenderer>();
                 if (body_skin == null)
                 {
+                    ab.Unload(true);
                     MelonLogger.Error("Failed to load player model.");
                     return;
                 }
@@ -109,12 +114,10 @@ namespace Model_Importer
             else
             {
                 MelonLogger.Error("Failed to load player model.");
+                ab.Unload(true);
                 return;
             }
-
-
         }
-
 
         public void updatePose()
         {
@@ -218,47 +221,6 @@ namespace Model_Importer
                 return modelName.GetHashCode();
             }
         }
-        ////////////////////////////////////////////////////////////////////////
-
-        // WIP (may or may not worked on)
-
-        ////////////////////////////////////////////////////////////////////////
-
-        public GameObject uiPanel;
-        public Slider heightSlider = new Slider();
-        public Slider playerSizeSlider = new Slider();
-        public Slider weaponSizeSlider = new Slider();
-        public Toggle dynamicHolsterToggle = new Toggle();
-        public Toggle[] weaponToggles = { new Toggle(), new Toggle() };
-
-        UnityEngine.Events.UnityAction<float> sa;
-        UnityEngine.Events.UnityAction<bool> ba;
-        public void onUI()
-        {
-            //// Now add the listeners correctly
-            //heightSlider.onValueChanged.AddListener(sa);
-            //playerSizeSlider.onValueChanged.AddListener(sa);
-            //weaponSizeSlider.onValueChanged.AddListener(sa);
-            //dynamicHolsterToggle.onValueChanged.AddListener(ba);
-
-            //for (int i = 0; i < weaponToggles.Length; i++)
-            //{
-            //    weaponToggles[i].onValueChanged.AddListener(ba);
-            //}
-        }
-        public void ApplyChanges()
-        {
-            Debug.Log("Applying changes...");
-        }
-
-        public void ResetToDefault()
-        {
-            Debug.Log("Reset to default settings.");
-        }
-
-        public void ToggleUI()
-        {
-            uiPanel.SetActive(!uiPanel.activeSelf);
-        }
+        
     }
 }

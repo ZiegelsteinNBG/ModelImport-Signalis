@@ -167,7 +167,7 @@ namespace Model_Importer
                 return false;
             }
         }
-        public static void copyComponent(GameObject dest, String comp_or, String name, bool setNull)
+        public static GameObject copyComponent(GameObject dest, String comp_or, String name, bool setNull)
         {
             GameObject comp_copy = copyObjectDDOL(comp_or, name, false);
             setParent(dest, comp_copy);
@@ -181,6 +181,7 @@ namespace Model_Importer
                 comp_copy.transform.localPosition = GameObject.Find(comp_or).transform.localPosition;
                 comp_copy.transform.localRotation = GameObject.Find(comp_or).transform.localRotation;
             }
+            return comp_copy;
         }
 
         public static Dictionary<String, int> dictList(SkinnedMeshRenderer skin)
@@ -205,6 +206,7 @@ namespace Model_Importer
             {
                 foreach (Transform bone in origin.bones)
                 {
+                    if (!dict.ContainsKey(bone.name)) continue;
                     Transform dest_Transform = dest.bones[dict[bone.name]];
                      if ((bone.name == "shoulder_R" || bone.name == "shoulder_L") && (dest.name.Contains("Placeholder")) && PlayerState.aiming && InventoryManager.EquippedWeapon.name != "Shotgun") // Placeholder
                     {
@@ -229,25 +231,26 @@ namespace Model_Importer
  
             setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default", model_or);
             MelonLogger.Msg($"Set Parent for Model: {model_or.name}");
-            GameObject root = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{model_or.name}/{normal}/Root/");
+            GameObject root = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{model_or.name}/{normal}/Root/hips");
             if(root == null)
             {
-                MelonLogger.Error($"Root not found for {model_or.name}");
+                MelonLogger.Error($"Hips not found for {model_or.name}");
                 return null;
             }
-            root.name = $"Root_{name}";
-            setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/", root);
+            //root.name = $"Root_{name}";
+            setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root", root);
             root.transform.localPosition = Vector3.zero;
             root.transform.localRotation = new Quaternion(0, 0, 0.7071f, 0.7071f);
 
             SkinnedMeshRenderer skin = model_or.transform.Find(body).GetComponent<SkinnedMeshRenderer>();
             skin.bones[dict["hips"]].localPosition = Vector3.zero;
 
-            copyComponent(skin.bones[dict["hand_R"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/", "WeaponMount", true);
+            GameObject weaponMod = copyComponent(skin.bones[dict["hand_R"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/", "WeaponMount", true);
             copyComponent(skin.bones[dict["hips"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/VisibleEquip/", "VisibleEquip", true);
             copyComponent(skin.bones[dict["chest"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/Nitro Model/", "Nitro Model", false);
-            copyComponent(skin.bones[dict["chest"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/FlashLightFlare/", "FlashLightFlare", true);
-
+            GameObject flashlight =  copyComponent(skin.bones[dict["chest"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/FlashLightFlare/", "FlashLightFlare", true);
+            weaponMod.SetActive(true);
+            flashlight.SetActive(true);
             return skin;
         }
     }
