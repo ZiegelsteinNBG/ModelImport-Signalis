@@ -32,7 +32,7 @@ namespace Model_Importer
         CutsceneCut cutsceneCut; // currentCutSceneCut
         CutsceneManager[] cutsceneManagers;
 
-        Dictionary<string, Dictionary<string, int>> cutScenesMetarig;
+        Dictionary<string, (GameObject, Dictionary<string, int>)> cutScenesMetarig;
 
 
         public override void OnUpdate()
@@ -144,7 +144,7 @@ namespace Model_Importer
                     Il2CppArrayBase<SkinnedMeshRenderer> skArray = scnene?.GetComponentsInChildren<SkinnedMeshRenderer>();
                     foreach(SkinnedMeshRenderer sk in skArray)
                     {
-                        if (sk.material.name.Contains("elstr"))
+                        if (sk.material.name.Contains("elster"))
                         {
 
                         }

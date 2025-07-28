@@ -1,10 +1,7 @@
-﻿using Il2Cpp;
+﻿
 using MelonLoader;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Model_Importer
@@ -195,7 +192,12 @@ namespace Model_Importer
             int idx = 0;
             foreach (Transform bone in skin.bones)
             {
-                keyValuePairs.Add(bone.name, idx++);
+
+                if (bone != null)
+                {
+                    keyValuePairs.Add(bone.name, idx++);
+                    MelonLogger.Msg($"Bone:{bone.name}");
+                }
             }
             return keyValuePairs;
         }
@@ -208,7 +210,9 @@ namespace Model_Importer
                 {
                     if (!dict.ContainsKey(bone.name)) continue;
                     Transform dest_Transform = dest.bones[dict[bone.name]];
-                     if ((bone.name == "shoulder_R" || bone.name == "shoulder_L") && (dest.name.Contains("Placeholder")) && PlayerState.aiming && InventoryManager.EquippedWeapon.name != "Shotgun") // Placeholder
+
+                    // Placeholder
+                    if ((bone.name == "shoulder_R" || bone.name == "shoulder_L") && (dest.name.Contains("Placeholder")) && PlayerState.aiming && InventoryManager.EquippedWeapon.name != "Shotgun") 
                     {
                         Vector3 eul = bone.localEulerAngles;
                         eul.y = eul.y * 1.065f;
@@ -216,6 +220,7 @@ namespace Model_Importer
                         dest_Transform.localEulerAngles = eul;
                         continue;
                     }
+
                     dest_Transform.localRotation = bone.localRotation;
                     if (bone.name == "hips") dest_Transform.localPosition = bone.localPosition;
                 }
@@ -228,29 +233,63 @@ namespace Model_Importer
 
         public static SkinnedMeshRenderer insertAlternative(GameObject model_or, String name, String body, String normal, Dictionary<String, int> dict)
         {
- 
-            setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default", model_or);
-            MelonLogger.Msg($"Set Parent for Model: {model_or.name}");
-            GameObject root = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{model_or.name}/{normal}/Root/hips");
-            if(root == null)
+            try
             {
-                MelonLogger.Error($"Hips not found for {model_or.name}");
-                return null;
+                setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default", model_or);
+                MelonLogger.Msg($"Set Parent for Model: {model_or.name}");
+                GameObject root = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{model_or.name}/{normal}/Root/hips");
+                if(root == null)
+                {
+                    MelonLogger.Error($"Hips not found for {model_or.name}");
+                    return null;
+                }
+                //root.name = $"Root_{name}";
+                setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root", root);
+                root.transform.localPosition = Vector3.zero;
+                root.transform.localRotation = new Quaternion(0, 0, 0.7071f, 0.7071f);
+
+                SkinnedMeshRenderer skin = model_or.transform.Find(body).GetComponent<SkinnedMeshRenderer>();
+                skin.bones[dict["hips"]].localPosition = Vector3.zero;
+
+                GameObject weaponMod = copyComponent(skin.bones[dict["hand_R"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/", "WeaponMount", true);
+                copyComponent(skin.bones[dict["hips"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/VisibleEquip/", "VisibleEquip", true);
+                copyComponent(skin.bones[dict["chest"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/Nitro Model/", "Nitro Model", false);
+                copyComponent(skin.bones[dict["chest"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/FlashLightFlare/", "FlashLightFlare", true);
+                weaponMod.SetActive(true);
+                return skin;
+                }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"Exception: {ex.GetType().Name}");
+                MelonLogger.Error($"Message: {ex.Message}");
+                MelonLogger.Error($"StackTrace: {ex.StackTrace}");
             }
-            //root.name = $"Root_{name}";
-            setParent("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root", root);
-            root.transform.localPosition = Vector3.zero;
-            root.transform.localRotation = new Quaternion(0, 0, 0.7071f, 0.7071f);
+            return null;
+        }
+
+        public static SkinnedMeshRenderer insertAlternative(GameObject model_or, GameObject model_dest, String body, String normal, Dictionary<String, int> dict)
+        {
+
+            setParent(model_dest.transform.parent.gameObject, model_or);
+            GameObject hips = model_or.transform.Find("Body").GetComponent<SkinnedMeshRenderer>().rootBone.gameObject;
+            GameObject hipsDest = model_dest.GetComponent<SkinnedMeshRenderer>().rootBone.parent.gameObject;
+            if (hips.name != "hips")
+            {
+                try
+                {
+                    hips = model_or.transform.Find("metarig/Root/hips").gameObject;
+                }
+                catch (Exception e)
+                {
+                    MelonLogger.Error($"insertAlternative: no hips found\n{e.Message}\n{e.StackTrace}");
+                }
+            }
+            setParent(hipsDest, hips);
+            hips.transform.localPosition = Vector3.zero;
+            hips.transform.localRotation = new Quaternion(0, 0, 0.7071f, 0.7071f);
 
             SkinnedMeshRenderer skin = model_or.transform.Find(body).GetComponent<SkinnedMeshRenderer>();
             skin.bones[dict["hips"]].localPosition = Vector3.zero;
-
-            GameObject weaponMod = copyComponent(skin.bones[dict["hand_R"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/", "WeaponMount", true);
-            copyComponent(skin.bones[dict["hips"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/VisibleEquip/", "VisibleEquip", true);
-            copyComponent(skin.bones[dict["chest"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/Nitro Model/", "Nitro Model", false);
-            GameObject flashlight =  copyComponent(skin.bones[dict["chest"]].gameObject, "__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/FlashLightFlare/", "FlashLightFlare", true);
-            weaponMod.SetActive(true);
-            flashlight.SetActive(true);
             return skin;
         }
     }

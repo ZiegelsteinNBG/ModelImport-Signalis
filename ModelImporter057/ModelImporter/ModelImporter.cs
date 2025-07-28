@@ -5,55 +5,117 @@ using System.Text;
 using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
-using Il2CppSystem.IO;
 using UnityEngine.SceneManagement;
-using Il2Cpp;
-using Il2CppSystem;
-using System.Xml.Serialization;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using System.IO;
+using UnityEngine.UI;
+using MeshCombineStudio;
+using UnhollowerBaseLib;
+using UnhollowerRuntimeLib;
 
 
 namespace Model_Importer
 {
     public class ModelImporter: MelonMod
     {
-
         private string dataPath;
         string currentDirectory;
         List<string> assetBundlePaths;
         Il2CppAssetBundle ab;
         static SkinnedMeshRenderer body_skin;
+        GameObject placeholder;
         GameObject player;
 
+        // Camera
+        List<Camera> camerasOrtho = new List<Camera>();
+        bool orth = false;
         
         Dictionary<string, int> boneDict;
 
         // Cutscenehandler
-        CutsceneCut cutsceneCut; // currentCutSceneCut
-        CutsceneManager[] cutsceneManagers;
+        List<(GameObject, SkinnedMeshRenderer)> cutScenemodels;
+        // CutSceneObject; CutSceneModel, boneDict
+        List<(GameObject, SkinnedMeshRenderer, SkinnedMeshRenderer)> cutScenemodelsIdx;
 
-        Dictionary<string, Dictionary<string, int>> cutScenesMetarig;
+        // GUI
+        private bool showGUI = false;
+        bool start = false;
+        private enum GUIMode { Main, Settings }
+        private GUIMode currentMode = GUIMode.Main;
 
+        void startGui()
+        {
+            ClassInjector.RegisterTypeInIl2Cpp<ModelImporterGUI>();
+
+            GameObject guiObject = new GameObject("ModelImporterGUI");
+            UnityEngine.Object.DontDestroyOnLoad(guiObject);
+            guiObject.AddComponent<ModelImporterGUI>();
+            guiObject.GetComponent<ModelImporterGUI>().enabled = true;
+        }
 
         public override void OnUpdate()
         {
-            if (player == null && GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default") != null)
+            try
             {
-                LoadModel();
-                cutsceneManagers = GameObject.FindObjectsOfType<CutsceneManager>();
-                if(cutsceneManagers != null)
+                if (player == null && GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default") != null)
                 {
+                    LoadModel();
+                    if (player != null)
+                    {
+                        insertModelCutScenes();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"loadingModel failed at {ex.Data} {ex.Source}");
+                MelonLogger.Error($"Exception: {ex.Message}");
+                MelonLogger.Error($"Stack Trace: {ex.StackTrace}");
+            }
+            try
+            {
+                if (body_skin != null && GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default") != null)
+                {
+                    if (player != null) updatePose();
+
+                    foreach ((GameObject, SkinnedMeshRenderer, SkinnedMeshRenderer) model in cutScenemodelsIdx)
+                    {
+                        if (model.Item1.activeInHierarchy)
+                        {
+                            HelperMethodsMI.updatePose(model.Item2, model.Item3, boneDict);
+                            model.Item3.gameObject.transform.parent.gameObject.SetActive(true);
+                        }
+                        else
+                        {
+                            model.Item3.gameObject.transform.parent.gameObject.SetActive(false);
+                        }
+                    }
+                }
+
+                if (Input.GetKeyDown(KeyCode.F7))
+                {
+                    if (!start)
+                    {
+                        startGui();
+                        start = true;
+                    }
+                    ModelImporterGUI.Instance?.ToggleGUI();
 
                 }
             }
-            if (body_skin != null && GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default") != null)
+            catch (System.Exception ex)
             {
-                if(player != null)updatePose();
+                MelonLogger.Error($"inserting failed at {ex.Data} {ex.Source}");
+                MelonLogger.Error($"Exception: {ex.Message}");
+                MelonLogger.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
+        Il2CppReferenceArray<GUILayoutOption> option = (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(200f) };
+
+
 
         private void LoadModel()
         {
+            // TODO Support multiple AB
             if(ab != null) ab.Unload(true);
             currentDirectory = Directory.GetCurrentDirectory();
             dataPath = Path.Combine(currentDirectory, "Mods", "ModelImporter_Data");
@@ -89,7 +151,8 @@ namespace Model_Importer
                     string[] assetNames = ab.AllAssetNames();
                     string objectName =Path.GetFileNameWithoutExtension(assetNames[0]);
                     MelonLogger.Msg($"Found model: {objectName}");
-                    player = GameObject.Instantiate(ab.LoadAsset<GameObject>(objectName).TryCast<GameObject>());// TODO
+                    // TODO handle this better you idiot
+                    player = GameObject.Instantiate(ab.LoadAsset<GameObject>(objectName).TryCast<GameObject>());
                     if (player == null)
                     {
                         MelonLogger.Error($"Failed to load asset 'Model' from AssetBundle: {file}");
@@ -106,10 +169,11 @@ namespace Model_Importer
                 }
             }
 
-            deactivateDefaultModels(iniModData());
-
             if (player != null)
             {
+                GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/")?.SetActive(false);
+                deactivateDefaultModels(GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default/"));
+
                 body_skin = player.transform.Find("Body").GetComponent<SkinnedMeshRenderer>();
                 if (body_skin == null)
                 {
@@ -117,8 +181,13 @@ namespace Model_Importer
                     MelonLogger.Error("Failed to load player model.");
                     return;
                 }
+                if(body_skin.rootBone.name != "hips") body_skin.rootBone = player.transform.Find("metarig/Root/hips");
                 boneDict = HelperMethodsMI.dictList(body_skin);
-                body_skin = HelperMethodsMI.insertAlternative(player, "imp_Mo", "Body", "metarig", boneDict); // TODO
+                // TODO could be better
+                placeholder = GameObject.Instantiate(player);
+                placeholder.SetActive(false);
+                body_skin = HelperMethodsMI.insertAlternative(player, "imp_Mo", "Body", "metarig", boneDict);
+                player.transform.localPosition = Vector3.zero;
             }
             else
             {
@@ -136,120 +205,273 @@ namespace Model_Importer
 
         void insertModelCutScenes()
         {
-            foreach(CutsceneManager cutsceneManager in cutsceneManagers)
+            cutScenemodels = new List<(GameObject, SkinnedMeshRenderer)>();
+            cutScenemodelsIdx = new List<(GameObject, SkinnedMeshRenderer, SkinnedMeshRenderer)>();
+            deactivateDefaultModels(GameObject.Find("Cutscenes"), ref cutScenemodels, false);
+            if (SceneManager.GetActiveScene().name == "PEN_Wreck")
             {
-                foreach(CutsceneCut cutsceneCut in cutsceneManager.scenes)
-                {
-                    GameObject scnene = cutsceneCut.gameObject;
-                    Il2CppArrayBase<SkinnedMeshRenderer> skArray = scnene?.GetComponentsInChildren<SkinnedMeshRenderer>();
-                    foreach(SkinnedMeshRenderer sk in skArray)
-                    {
-                        if (sk.material.name.Contains("elstr"))
-                        {
-
-                        }
-                    }
-                }
+                deactivateDefaultModels(GameObject.Find("Maintenance (Start)/Chunk/Ellie_Cutscene_Wakeup_Pivot/Ellie_Cutscene_Wakeup/"), ref cutScenemodels, false);
+            }else if( SceneManager.GetActiveScene().name == "LAB_Emptiness" )
+            {
+                deactivateDefaultModels(GameObject.Find("Cutscenes/The Crash Site - Infinity/LAB_Death_5 Elster Transparent/Wide_1/GameObject/Pivot/"), ref cutScenemodels, true);
+                deactivateDefaultModels(GameObject.Find("Cutscenes/Hatch Failure - Beyond/LAB_Hatch_2 Silhouette Pull/Wide_1/Elster/"), ref cutScenemodels, true);
             }
+            int idx = 0;
+            foreach ((GameObject, SkinnedMeshRenderer) model in cutScenemodels)
+            {
+                GameObject cutSceneModel = GameObject.Instantiate(placeholder);
+                SkinnedMeshRenderer[] skMats = cutSceneModel.GetComponentsInChildren<SkinnedMeshRenderer>();
+                foreach (SkinnedMeshRenderer skMat in skMats)
+                {
+                    Material mat2 = skMat.material;
+                    if (model.Item2.material.name.Contains("monsterFX (Instance)"))
+                    {
+                        skMat.material = model.Item2.material;
+                        continue;
+                    }
+                    mat2.shader = Shader.Find("Toon/Cutoff");
+                }
+                cutSceneModel.name = $"cutsceneModel{idx++}";
+                HelperMethodsMI.insertAlternative(cutSceneModel, model.Item1, "Body", "metarig", boneDict);
+                cutSceneModel.SetActive(false);
+                cutScenemodelsIdx.Add((model.Item1, model.Item2, cutSceneModel.transform.Find("Body").GetComponent<SkinnedMeshRenderer>()));
+                cutSceneModel.transform.localPosition = Vector3.zero;
+            }
+
         }
 
-        // ModData: deactivate the default models
-        private string[] modelNames = new string[] { "Normal", "Armored", "Crippled", "EVA", "Isa_Past" };
-        public void deactivateDefaultModels(ModData modData)
+        // Make all DefaultModels invisble
+        public void deactivateDefaultModels(GameObject parent, ref List<(GameObject, SkinnedMeshRenderer)> models, bool ign)
         {
-            string modelEx = "";
-            string modelPartEx = "";
-            GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/")?.SetActive(false);
-               
             try
             {
-                foreach (string modeld in modelNames)
+                foreach (SkinnedMeshRenderer sk in parent?.GetComponentsInChildren<SkinnedMeshRenderer>(true))
                 {
-                    modelEx = modeld;
-                    ModelData modelData = modData.FindModelDataByName(modeld);
-
-                    for (int i = 0; i < modelData.modelParts.Length; i++)
+                    // Assuming all LSTR models use a material with the name "elster" inside
+                    if (sk.material.name.Contains("elster") || ign)
                     {
-                        HelperMethodsMI.setChildActive("__Prerequisites__/Character Origin/Character Root/Ellie_Default/", modeld, true);
-
-                        string part = modelData.modelParts[i];
-                        modelPartEx = part;
-                        GameObject gameObject = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{modeld}/{part}");
-                        if (modeld == "Normal" && part == "Body")
+                        GameObject model = sk.gameObject;
+                        // Again assuming all LSTR models use a armature with the name "metarig" 
+                        if (!models.Contains((model, sk)) && model.name.ToLower().Contains("body"))
                         {
-                            gameObject.SetActive(true);
-                            SkinnedMeshRenderer meshRendererOrigin = gameObject.GetComponent<SkinnedMeshRenderer>();
-                            meshRendererOrigin.GetComponent<Renderer>().castShadows = false;
-                            Material material = meshRendererOrigin.material;
-                            material.color = new Color(0, 0, 0, -1);
-                            continue;
+                            models.Add((model, sk));
+                            SkinnedMeshRenderer[] rest = model.transform.parent.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>();
+                            foreach (SkinnedMeshRenderer sk2 in rest)
+                            {
+                                sk2.GetComponent<Renderer>().castShadows = false;
+                                Material material = sk2.material;
+                                material.color = new Color(0, 0, 0, -1);
+                            }
                         }
-                        gameObject.SetActive(false);
                     }
+                    
                 }
             }
             catch (System.Exception ex)
             {
-                MelonLogger.Error($"deactivateDefaultModels failed at EllieDefault: __Prerequisites__/Character Origin/Character Root/Ellie_Default/{modelEx}/{modelPartEx}");
+                MelonLogger.Error($"deactivateModels failed at {parent.name}");
                 MelonLogger.Error($"Exception: {ex.Message}");
                 MelonLogger.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
 
-        public static ModData iniModData()
+        public void deactivateDefaultModels(GameObject parent)
         {
-            ModData modData = new ModData
+            try
             {
-                modelData = new List<ModelData>()
-            };
-            
-
-            // Elster Models (0-4)
-            string[] modelParts_ELNormal = { "Body", "Hair", "Tasche", "HairHead" };
-            modData.modelData.Add(new ModelData("Normal", modelParts_ELNormal));
-            string[] modelParts_ELArmor = { "Body", "Hair", "HairHead", "Armor", "TascheArmor" };
-            modData.modelData.Add(new ModelData("Armored", modelParts_ELArmor));
-
-            string[] modelParts_ELEVA = { "Body", "Helmet", "Neck", "Backpack", "TascheArmor", "Visor", "Visor Layer2" };
-            modData.modelData.Add(new ModelData("EVA", modelParts_ELEVA));
-
-            string[] modelParts_ELCrippled = { "Body", "Organs", "Hair", "HairHead" };
-            modData.modelData.Add(new ModelData("Crippled", modelParts_ELCrippled));
-
-            string[] modelParts_IsaPast = { "Body", "Hair", "HairHead", "Skirt", "Braid" };
-            modData.modelData.Add(new ModelData("Isa_Past", modelParts_IsaPast));
-
-            return modData;
-        }
-
-        public class ModData
-        {
-            public List<ModelData> modelData { get; set; }
-
-            public ModelData FindModelDataByName(string modelName)
+                foreach (SkinnedMeshRenderer sk in parent?.GetComponentsInChildren<SkinnedMeshRenderer>())
+                {
+                    // Assuming all LSTR models use a material with the name "elster" inside
+                    if (sk.material.name.Contains("elster"))
+                    {
+                        sk.GetComponent<Renderer>().castShadows = false;
+                        Material material = sk.material;
+                        material.color = new Color(0, 0, 0, -1);
+                    }
+                }
+            }
+            catch (System.Exception ex)
             {
-                return modelData.FirstOrDefault(md => md.modelName == modelName);
+                MelonLogger.Error($"deactivateModels failed at {parent.name}");
+                MelonLogger.Error($"Exception: {ex.Message}");
+                MelonLogger.Error($"Stack Trace: {ex.StackTrace}");
             }
         }
 
-        public class ModelData
-        {
-            public string modelName { get; set; }
 
-            public string[] modelParts { get; set; }
-
-            public ModelData() { }
-            public ModelData(string modelName, string[] modelParts)
-            {
-                this.modelName = modelName;
-                this.modelParts = modelParts;
-            }
-
-            public override int GetHashCode()
-            {
-                return modelName.GetHashCode();
-            }
-        }
         
     }
+    [RegisterTypeInIl2Cpp]
+    public class ModelImporterGUI : MonoBehaviour
+    {
+        public static ModelImporterGUI Instance;
+        public bool showGUI = false;
+
+        public enum GUIMode { Main, Settings }
+        public GUIMode currentMode = GUIMode.Main;
+
+        private float sliderValue = 1.0f;
+        private float maxSliderValue = 2.0f;
+
+        private Il2CppReferenceArray<GUILayoutOption> option =
+            (Il2CppReferenceArray<GUILayoutOption>)new GUILayoutOption[] { GUILayout.Width(200f) };
+
+        public ModelImporterGUI(IntPtr ptr) : base(ptr) { }
+        public void ToggleGUI()
+        {
+            showGUI = !showGUI;
+            MelonLogger.Msg($"GUI is now {(showGUI ? "visible" : "hidden")}");
+        }
+
+        void Awake()
+        {
+            Instance = this;
+        }
+
+        void OnGUI()
+        {
+            GUI.Label(new Rect(10, 10, 200, 20), "DEBUG: GUI is drawing!");
+            if (!showGUI) return;
+
+            GUILayout.BeginArea(new Rect(0, 0, 300, 200));
+            GUILayout.BeginHorizontal(option);
+            if (GUILayout.Button("Main", option)) currentMode = GUIMode.Main;
+            if (GUILayout.Button("Settings", option)) currentMode = GUIMode.Settings;
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
+
+            switch (currentMode)
+            {
+                case GUIMode.Main:
+                    DrawMainTab();
+                    break;
+                case GUIMode.Settings:
+                    DrawSettingsTab();
+                    break;
+            }
+
+            GUILayout.EndArea();
+        }
+
+        void DrawMainTab()
+        {
+            GUILayout.BeginHorizontal(option);
+            if (GUILayout.RepeatButton("Increase max\nSlider Value", option))
+            {
+                maxSliderValue += 3.0f * Time.deltaTime;
+            }
+
+            GUILayout.BeginVertical(option);
+            GUILayout.Box("Slider Value: " + Mathf.Round(sliderValue), option);
+            sliderValue = GUILayout.HorizontalSlider(sliderValue, -2.0f, maxSliderValue, option);
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
+        }
+
+        void DrawSettingsTab()
+        {
+            GUILayout.Label("Settings go here...", option);
+        }
+    }
+    /// <summary>
+    /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// </summary>
+    // OUTDATED
+    // ModData: deactivate the default models
+    //private string[] modelNames = new string[] { "Normal", "Armored", "Crippled", "EVA", "Isa_Past" };
+    //public void deactivateDefaultModels(ModData modData)
+    //{
+    //    string modelEx = "";
+    //    string modelPartEx = "";
+    //    GameObject.Find("__Prerequisites__/Character Origin/Character Root/Ellie_Default/metarig/Root/hips/spine/chest/shoulder_R/upper_arm_R/forearm_R/hand_R/WeaponMount/")?.SetActive(false);
+
+    //    try
+    //    {
+    //        foreach (string modeld in modelNames)
+    //        {
+    //            modelEx = modeld;
+    //            ModelData modelData = modData.FindModelDataByName(modeld);
+
+    //            for (int i = 0; i < modelData.modelParts.Length; i++)
+    //            {
+    //                HelperMethodsMI.setChildActive("__Prerequisites__/Character Origin/Character Root/Ellie_Default/", modeld, true);
+
+    //                string part = modelData.modelParts[i];
+    //                modelPartEx = part;
+    //                GameObject gameObject = GameObject.Find($"__Prerequisites__/Character Origin/Character Root/Ellie_Default/{modeld}/{part}");
+    //                if (modeld == "Normal" && part == "Body")
+    //                {
+    //                    gameObject.SetActive(true);
+    //                    SkinnedMeshRenderer meshRendererOrigin = gameObject.GetComponent<SkinnedMeshRenderer>();
+    //                    meshRendererOrigin.GetComponent<Renderer>().castShadows = false;
+    //                    Material material = meshRendererOrigin.material;
+    //                    material.color = new Color(0, 0, 0, -1);
+    //                    continue;
+    //                }
+    //                gameObject.SetActive(false);
+    //            }
+    //        }
+    //    }
+    //    catch (System.Exception ex)
+    //    {
+    //        MelonLogger.Error($"deactivateDefaultModels failed at EllieDefault: __Prerequisites__/Character Origin/Character Root/Ellie_Default/{modelEx}/{modelPartEx}");
+    //        MelonLogger.Error($"Exception: {ex.Message}");
+    //        MelonLogger.Error($"Stack Trace: {ex.StackTrace}");
+    //    }
+    //}
+
+    //public static ModData iniModData()
+    //{
+    //    ModData modData = new ModData
+    //    {
+    //        modelData = new List<ModelData>()
+    //    };
+
+
+    //    // Elster Models (0-4)
+    //    string[] modelParts_ELNormal = { "Body", "Hair", "Tasche", "HairHead" };
+    //    modData.modelData.Add(new ModelData("Normal", modelParts_ELNormal));
+    //    string[] modelParts_ELArmor = { "Body", "Hair", "HairHead", "Armor", "TascheArmor" };
+    //    modData.modelData.Add(new ModelData("Armored", modelParts_ELArmor));
+
+    //    string[] modelParts_ELEVA = { "Body", "Helmet", "Neck", "Backpack", "TascheArmor", "Visor", "Visor Layer2" };
+    //    modData.modelData.Add(new ModelData("EVA", modelParts_ELEVA));
+
+    //    string[] modelParts_ELCrippled = { "Body", "Organs", "Hair", "HairHead" };
+    //    modData.modelData.Add(new ModelData("Crippled", modelParts_ELCrippled));
+
+    //    string[] modelParts_IsaPast = { "Body", "Hair", "HairHead", "Skirt", "Braid" };
+    //    modData.modelData.Add(new ModelData("Isa_Past", modelParts_IsaPast));
+
+    //    return modData;
+    //}
+
+    //public class ModData
+    //{
+    //    public List<ModelData> modelData { get; set; }
+
+    //    public ModelData FindModelDataByName(string modelName)
+    //    {
+    //        return modelData.FirstOrDefault(md => md.modelName == modelName);
+    //    }
+    //}
+
+    //public class ModelData
+    //{
+    //    public string modelName { get; set; }
+
+    //    public string[] modelParts { get; set; }
+
+    //    public ModelData() { }
+    //    public ModelData(string modelName, string[] modelParts)
+    //    {
+    //        this.modelName = modelName;
+    //        this.modelParts = modelParts;
+    //    }
+
+    //    public override int GetHashCode()
+    //    {
+    //        return modelName.GetHashCode();
+    //    }
+    //}
 }
