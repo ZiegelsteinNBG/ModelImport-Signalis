@@ -78,7 +78,7 @@ If everything is set up correctly, the example model should appear in the scene.
 It is important to have the bone orientation and the export if the model to be correct. Compare the bone orientations and rotate them correctly in the editor. If you are finished, export the fbx with primary bones +x, secondary bones -y.
 
 <p align="center">
-  <img src="img/image.png" width="42%" />
+  <img src="img/image.png" width="40.5%" />
   <img src="img/BoneOrientation.png" width="45%" />
 </p>
 
