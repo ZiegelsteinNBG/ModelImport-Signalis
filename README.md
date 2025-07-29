@@ -77,9 +77,9 @@ If everything is set up correctly, the example model should appear in the scene.
 ### 5.1 Prepare your model in blender
 It is important to have the bone orientation and the export if the model to be correct. Compare the bone orientations and rotate them correctly in the editor. If you are finished, export the fbx with primary bones +x, secondary bones -y.
 
-TODO ADD PICTURE
 <p align="center">
-  <img align="center" src="img/ScriptAndImport.png">
+  <img src="img/image.png" width="45%" />
+  <img src="img/BoneOrientation.png" width="45%" />
 </p>
 
 ### 5.2 Import Your Model
