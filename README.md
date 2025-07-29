@@ -19,7 +19,7 @@ This mod operates based on demand, so I list the following possibilities where I
 Version 0.1.0-alpha is the first working release. Future versions may change requirements and introduce new features.
 
 **Requirement:**
-[**Melonloader v0.7.0**](https://melonwiki.xyz/#/README?id=automated-installation)
+[**Melonloader v0.5.7**](https://melonwiki.xyz/#/README?id=automated-installation)
 
 **Where to put the file?**
 
