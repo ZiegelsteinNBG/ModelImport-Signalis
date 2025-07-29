@@ -108,6 +108,7 @@ To check if you have the bone orientations correct, you can import the example m
 <p align="center">
   <img src="img/SimilarPose.png" />
 </p>
+
 ### 6. Prepare the Model for Export
 Before exporting, make sure to add your prefab to an AssetBundle. Click on your prefab and find the bar at the bottom right named AssetBundles, where the model inspector is located. (As shown in the picture below.)
 
