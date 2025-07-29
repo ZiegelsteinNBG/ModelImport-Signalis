@@ -126,5 +126,5 @@ You can test it by creating a new Unity project and importing the AssetBundle wi
 Alternatively, and more importantly, you can test it by placing the AssetBundle in the ModelImporter_data folder and testing the mod.
 
 <p align="center">
-  <img align="center" src="img/MISuccess.png">
+  <img align="center" src="img/2B1.png">
 </p>
