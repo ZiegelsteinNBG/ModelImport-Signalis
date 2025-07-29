@@ -74,12 +74,22 @@ If everything is set up correctly, the example model should appear in the scene.
   <img align="center" src="img/ScriptAndImport.png">
 </p>
 
-### 5. Import Your Model
+### 5.1 Prepare your model in blender
+It is important to have the bone orientation and the export if the model to be correct. Compare the bone orientations and rotate them correctly in the editor. If you are finished, export the fbx with primary bones +x, secondary bones -y.
+
+TODO ADD PICTURE
+<p align="center">
+  <img align="center" src="img/ScriptAndImport.png">
+</p>
+
+### 5.2 Import Your Model
 Drag your .fbx or .obj model into the Assets folder.
 
 Make sure the model has the correct rig and bone structure. Additional parts should be on the same layer as the body or parented to the appropriate bones.
 
 It’s important that the skeleton is named "metarig" as shown in the example. Every bone you want to animate, similar to the ones in the game, should be named exactly as in the example. Missing bones or additional bones will not be animated.
+
+To check if you have the bone orientations correct, you can import the example model and copy and paste each rotation of the bones to your model and you will get a similar pose if the bone orientations are correct. 
 
 ### 6. Prepare the Model for Export
 Before exporting, make sure to add your prefab to an AssetBundle. Click on your prefab and find the bar at the bottom right named AssetBundles, where the model inspector is located. (As shown in the picture below.)
