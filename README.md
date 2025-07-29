@@ -75,22 +75,38 @@ If everything is set up correctly, the example model should appear in the scene.
 </p>
 
 ### 5.1 Prepare your model in blender
-It is important to have the bone orientation and the export if the model to be correct. Compare the bone orientations and rotate them correctly in the editor. If you are finished, export the fbx with primary bones +x, secondary bones -y.
+It’s important to ensure both the bone orientations and export settings are correct. First, enable In Front and Axes under the Viewport Display for your armature to help visualize bone directions.
 
+To adjust a bone’s orientation, select the bone, go to the Item tab on the right side, and modify its Roll value.
+<p align="center">
+  <img src="img/BlenderHelp.png" />
+</p>
+For the legs, shoulders, arms, and hands (including fingers), rotate the bones so the Z-axis points outward. In most cases, setting the roll to -90° or +90° will achieve the correct orientation.
+
+Compare your bone orientations with the reference images below to verify alignment.
 <p align="center">
   <img src="img/image.png" width="42%" />
   <img src="img/BoneOrientation.png" width="45%" />
 </p>
-
+If you are finished, export the .fbx with primary bones +x, secondary bones -y.
+<p align="center">
+  <img src="img/ExportAxis.png" />
+</p>
 ### 5.2 Import Your Model
-Drag your .fbx or .obj model into the Assets folder.
-
+Drag your .fbx or .obj model into the Assets folder. Then, drag the model into the Scene view and unpack it to begin editing.
+  <img src="img/Unpack.png" />
+</p>
 Make sure the model has the correct rig and bone structure. Additional parts should be on the same layer as the body or parented to the appropriate bones.
 
 It’s important that the skeleton is named "metarig" as shown in the example. Every bone you want to animate, similar to the ones in the game, should be named exactly as in the example. Missing bones or additional bones will not be animated.
 
 To check if you have the bone orientations correct, you can import the example model and copy and paste each rotation of the bones to your model and you will get a similar pose if the bone orientations are correct. 
-
+<p align="center">
+  <img src="img/CopyRotation.png" />
+</p>If everything went correctly, you should see your model assuming the same pose. As you can see, I used a 2B model, which has more bones than the LSTR model. You can simply ignore the bones you don't need and use only the ones that fit best.
+<p align="center">
+  <img src="img/SimilarPose.png" />
+</p>
 ### 6. Prepare the Model for Export
 Before exporting, make sure to add your prefab to an AssetBundle. Click on your prefab and find the bar at the bottom right named AssetBundles, where the model inspector is located. (As shown in the picture below.)
 
