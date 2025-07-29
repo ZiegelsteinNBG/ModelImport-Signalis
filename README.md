@@ -92,6 +92,7 @@ If you are finished, export the .fbx with primary bones +x, secondary bones -y.
 <p align="center">
   <img src="img/ExportAxis.png" />
 </p>
+
 ### 5.2 Import Your Model
 Drag your .fbx or .obj model into the Assets folder. Then, drag the model into the Scene view and unpack it to begin editing.
   <img src="img/Unpack.png" />
