@@ -1,8 +1,9 @@
-﻿
+
 using MelonLoader;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static RootMotion.FinalIK.IKSolverVR;
 
 namespace Model_Importer
 {
@@ -202,7 +203,7 @@ namespace Model_Importer
             return keyValuePairs;
         }
 
-        public static void updatePose(SkinnedMeshRenderer origin, SkinnedMeshRenderer dest, Dictionary<String, int> dict)
+        public static void updatePose(SkinnedMeshRenderer origin, SkinnedMeshRenderer dest, Dictionary<String, int> dict, float armY = 1.0f, float armZ = 1.0f)
         {
             try
             {
@@ -212,11 +213,11 @@ namespace Model_Importer
                     Transform dest_Transform = dest.bones[dict[bone.name]];
 
                     // Placeholder
-                    if ((bone.name == "shoulder_R" || bone.name == "shoulder_L") && (dest.name.Contains("Placeholder")) && PlayerState.aiming && InventoryManager.EquippedWeapon.name != "Shotgun") 
+                    if ((bone.name == "shoulder_L") && PlayerState.aiming) 
                     {
                         Vector3 eul = bone.localEulerAngles;
-                        eul.y = eul.y * 1.065f;
-                        eul.z = eul.z * 0.99f;
+                        eul.y = eul.y * armY;
+                        eul.z = eul.z * armZ;
                         dest_Transform.localEulerAngles = eul;
                         continue;
                     }
