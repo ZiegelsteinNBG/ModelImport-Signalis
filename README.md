@@ -16,9 +16,11 @@ This mod operates based on demand, so I list the following possibilities where I
 ## Mod requirement/ installment
 Version 0.2.0 features:
 - Body Part Toggle
+  
   Toggle individual body parts on or off to create more variations in your models.
 
 - Left Arm Adjuster (Early Stage)
+  
   Adjust the position of the left arm while aiming to help fix overlapping arms.
 
 **Requirement:**
